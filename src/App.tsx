@@ -31,15 +31,44 @@ const App: React.FC = () => {
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [showCheckIn, setShowCheckIn] = useState(false);
 
-  const fetchHabits = async () => {
-    if (!token) return;
+  const performLogout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    sessionStorage.removeItem('checked_in');
+    setHabits([]);
+    setCompletions({});
+  };
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: 'Sign Out?',
+      text: "Are you sure you want to exit your dashboard?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#8B5CF6',
+      cancelButtonColor: '#161B22',
+      confirmButtonText: 'Yes, sign out',
+      background: '#0B0E14',
+      color: '#fff'
+    });
+
+    if (result.isConfirmed) {
+      performLogout();
+    }
+  };
+
+  const fetchHabits = async (overrideToken?: string) => {
+    const activeToken = overrideToken || token;
+    if (!activeToken) return;
     try {
       const response = await fetch(`${API_BASE}/habits`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${activeToken}` }
       });
       
       if (response.status === 401) {
-        handleLogout();
+        performLogout();
         return;
       }
 
@@ -52,7 +81,7 @@ const App: React.FC = () => {
         
         const newCompletions: CompletionData = {};
         data.forEach((h: any) => {
-          Object.entries(h.completions).forEach(([date, val]) => {
+          Object.entries(h.completions || {}).forEach(([date, val]) => {
              if (!newCompletions[date]) newCompletions[date] = {};
              newCompletions[date][h._id] = val as boolean;
           });
@@ -61,7 +90,6 @@ const App: React.FC = () => {
         setHabits(habitsWithCompletions);
         setCompletions(newCompletions);
         
-        // Show check-in if data was fetched successfully and session hasn't seen it
         if (!sessionStorage.getItem('checked_in')) {
             setShowCheckIn(true);
             sessionStorage.setItem('checked_in', 'true');
@@ -88,7 +116,6 @@ const App: React.FC = () => {
     const rate = totalPossibleSoFar > 0 ? Math.round((actualDone / totalPossibleSoFar) * 100) : 0;
 
     let currentStreak = 0;
-    const sortedDates = Object.keys(completions).sort((a,b) => b.localeCompare(a));
     
     for (let i = 0; i < 30; i++) {
         const d = new Date();
@@ -109,34 +136,11 @@ const App: React.FC = () => {
   }, [habits, completions, currentDate]);
 
   const handleLogin = (newToken: string, newUser: { id: string; name: string; email: string }) => {
-    setToken(newToken);
-    setUser(newUser);
     localStorage.setItem('auth_token', newToken);
     localStorage.setItem('auth_user', JSON.stringify(newUser));
-  };
-
-  const handleLogout = async () => {
-    const result = await Swal.fire({
-      title: 'Sign Out?',
-      text: "Are you sure you want to exit your dashboard?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#8B5CF6',
-      cancelButtonColor: '#161B22',
-      confirmButtonText: 'Yes, sign out',
-      background: '#0B0E14',
-      color: '#fff'
-    });
-
-    if (result.isConfirmed) {
-      setToken(null);
-      setUser(null);
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      sessionStorage.removeItem('checked_in');
-      setHabits([]);
-      setCompletions({});
-    }
+    setToken(newToken);
+    setUser(newUser);
+    fetchHabits(newToken);
   };
 
   const handleToggle = async (habitId: string, dateKey: string) => {
@@ -167,8 +171,11 @@ const App: React.FC = () => {
 
   const handleSaveHabit = async (data: Omit<Habit, 'id'> & { id?: string }) => {
     if (!token) return;
-    const method = data.id ? 'PUT' : 'POST';
-    const url = data.id ? `${API_BASE}/habits/${data.id}` : `${API_BASE}/habits`;
+    const isUpdate = !!data.id;
+    const method = isUpdate ? 'PUT' : 'POST';
+    const url = isUpdate ? `${API_BASE}/habits/${data.id}` : `${API_BASE}/habits`;
+
+    const { id, ...cleanData } = data;
 
     try {
       const response = await fetch(url, {
@@ -177,7 +184,7 @@ const App: React.FC = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(cleanData)
       });
       if (response.ok) fetchHabits();
     } catch (err) {

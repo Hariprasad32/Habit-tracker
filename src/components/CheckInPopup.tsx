@@ -34,57 +34,57 @@ const CheckInPopup: React.FC<CheckInPopupProps> = ({ streak, onClose }) => {
         initial={{ scale: 0.8, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.8, opacity: 0, y: 50 }}
-        className="relative bg-[#161B22] rounded-[3rem] shadow-[0_0_80px_rgba(139,92,246,0.25)] border border-white/10 w-full max-w-lg overflow-hidden p-10 text-center"
+        className="relative bg-[#161B22] rounded-[2.5rem] shadow-[0_0_60px_rgba(139,92,246,0.2)] border border-white/10 w-full max-w-md overflow-hidden p-8 text-center"
       >
-         <button onClick={onClose} className="absolute top-6 right-6 p-2.5 hover:bg-white/5 rounded-2xl text-white/20 hover:text-white transition-all">
-            <X size={20} />
+         <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-white/5 rounded-xl text-white/20 hover:text-white transition-all">
+            <X size={18} />
          </button>
 
          <div className="flex flex-col items-center">
             <motion.div 
               initial={{ rotate: -20, scale: 0.5 }}
-              animate={{ rotate: 0, scale: 1.2 }}
+              animate={{ rotate: 0, scale: 1.1 }}
               transition={{ delay: 0.2, type: 'spring' }}
-              className="relative mb-12"
+              className="relative mb-8"
             >
-               <div className="absolute inset-0 bg-primary/30 blur-[40px] rounded-full" />
-               <div className="relative p-8 bg-primary rounded-[2.5rem] shadow-[0_0_30px_rgba(139,92,246,0.6)]">
-                  <Flame size={64} fill="white" className="text-white" />
+               <div className="absolute inset-0 bg-primary/20 blur-[30px] rounded-full" />
+               <div className="relative p-6 bg-primary rounded-[2rem] shadow-[0_0_20px_rgba(139,92,246,0.5)]">
+                  <Flame size={48} fill="white" className="text-white" />
                </div>
-               <div className="absolute -bottom-4 -right-4 bg-white text-primary p-3 rounded-2xl shadow-xl font-black text-xl">
+               <div className="absolute -bottom-2 -right-2 bg-white text-primary p-2 rounded-xl shadow-lg font-black text-lg">
                   {streak}
                </div>
             </motion.div>
 
-            <h2 className="text-4xl font-black text-white mb-4 tracking-tight uppercase italic flex items-center gap-3">
-              Daily Check-In <Sparkles size={32} className="text-secondary" />
+            <h2 className="text-3xl font-black text-white mb-2 tracking-tight uppercase italic flex items-center gap-2">
+              Daily Check-In <Sparkles size={24} className="text-secondary" />
             </h2>
             
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 mb-10">You're on fire! Keep it moving.</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 mb-8">You're on fire! Keep it moving.</p>
 
-            <div className="relative mb-12 p-8 bg-white/5 rounded-3xl border border-white/5">
-                <Quote size={40} className="absolute -top-5 -left-5 text-primary opacity-50" />
-                <p className="text-xl font-medium text-white italic leading-relaxed">"{randomQuote}"</p>
-                <Quote size={40} className="absolute -bottom-5 -right-5 text-primary opacity-50 rotate-180" />
+            <div className="relative mb-8 p-6 bg-white/5 rounded-2xl border border-white/5">
+                <Quote size={30} className="absolute -top-4 -left-4 text-primary opacity-30" />
+                <p className="text-lg font-medium text-white italic leading-relaxed">"{randomQuote}"</p>
+                <Quote size={30} className="absolute -bottom-4 -right-4 text-primary opacity-30 rotate-180" />
             </div>
 
-            <div className="grid grid-cols-2 gap-6 w-full">
-               <div className="p-6 bg-white/[0.03] rounded-3xl border border-white/5 flex flex-col items-center">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">Current Streak</span>
-                  <span className="text-2xl font-black text-white">{streak} Days</span>
+            <div className="grid grid-cols-2 gap-4 w-full">
+               <div className="p-4 bg-white/[0.02] rounded-2xl border border-white/5 flex flex-col items-center">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-primary mb-1">Streak</span>
+                  <span className="text-xl font-black text-white">{streak} Days</span>
                </div>
-               <div className="p-6 bg-white/[0.03] rounded-3xl border border-white/5 flex flex-col items-center">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-secondary mb-2">Total Progress</span>
-                  <span className="text-2xl font-black text-white">{streak > 0 ? 'Ignited' : 'Starting'}</span>
+               <div className="p-4 bg-white/[0.02] rounded-2xl border border-white/5 flex flex-col items-center">
+                  <span className="text-[9px] font-black uppercase tracking-widest text-secondary mb-1">Status</span>
+                  <span className="text-xl font-black text-white">{streak > 0 ? 'Ignited' : 'Starting'}</span>
                </div>
             </div>
 
             <button 
               onClick={onClose}
-              className="mt-12 w-full py-6 bg-primary text-white rounded-[1.5rem] font-black text-xl shadow-[0_15px_30px_rgba(139,92,246,0.3)] hover:scale-105 transition-all flex items-center justify-center gap-4"
+              className="mt-8 w-full py-5 bg-primary text-white rounded-[1.25rem] font-black text-lg shadow-[0_10px_20px_rgba(139,92,246,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3"
             >
               <span>Let's Go</span>
-              <Trophy size={24} />
+              <Trophy size={20} />
             </button>
          </div>
       </motion.div>

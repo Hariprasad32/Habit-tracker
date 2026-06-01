@@ -18,7 +18,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
     setLoading(true);
 
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
-    const baseUrl = 'http://localhost:5001';
+    const baseUrl = import.meta.env.VITE_API_URL;
 
     try {
       const response = await fetch(`${baseUrl}${endpoint}`, {
