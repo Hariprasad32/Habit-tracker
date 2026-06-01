@@ -1,0 +1,31 @@
+
+> habit-tracker@0.0.0 build
+> vite build
+
+vite v8.0.16 building client environment for production...
+[2Ktransforming...✓ 2146 modules transformed.
+✗ Build failed in 1.09s
+error during build:
+Build failed with 1 error:
+
+[plugin vite:css] /home/hari/Desktop/mini-projects/habit tracker/src/index.css:undefined:NaN
+Error: [postcss] It looks like you're trying to use `tailwindcss` directly as a PostCSS plugin. The PostCSS plugin has moved to a separate package, so to continue using Tailwind CSS with PostCSS you'll need to install `@tailwindcss/postcss` and update your PostCSS configuration.
+    at ft (/home/hari/Desktop/mini-projects/habit tracker/node_modules/tailwindcss/dist/lib.js:38:1643)
+    at LazyResult.runOnRoot (/home/hari/Desktop/mini-projects/habit tracker/node_modules/postcss/lib/lazy-result.js:361:16)
+    at LazyResult.runAsync (/home/hari/Desktop/mini-projects/habit tracker/node_modules/postcss/lib/lazy-result.js:290:26)
+    at LazyResult.async (/home/hari/Desktop/mini-projects/habit tracker/node_modules/postcss/lib/lazy-result.js:192:30)
+    at LazyResult.then (/home/hari/Desktop/mini-projects/habit tracker/node_modules/postcss/lib/lazy-result.js:449:17)
+    at async runPostCSS (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:21166:19)
+    at async compilePostCSS (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:21150:6)
+    at async compileCSS (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:21080:26)
+    at async TransformPluginContextImpl.handler (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:20588:47)
+    at async plugin (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/rolldown/dist/shared/bindingify-input-options-ClrST5Xx.mjs:1185:16)
+    at aggregateBindingErrorsIntoJsError (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/rolldown/dist/shared/error-BuvQYXuZ.mjs:48:18)
+    at unwrapBindingResult (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/rolldown/dist/shared/error-BuvQYXuZ.mjs:18:128)
+    at #build (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/rolldown/dist/shared/rolldown-build-CrPk_lZe.mjs:3246:34)
+    at async buildEnvironment (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:33253:64)
+    at async Object.build (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:33675:19)
+    at async Object.buildApp (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/chunks/node.js:33672:153)
+    at async CAC.<anonymous> (file:///home/hari/Desktop/mini-projects/habit%20tracker/node_modules/vite/dist/node/cli.js:777:3) {
+  errors: [Getter/Setter]
+}

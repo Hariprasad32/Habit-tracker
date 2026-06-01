@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #8B5CF6;        /* Electric Purple */
+  --color-primary-dark: #7C3AED;
+  --color-secondary: #06B6D4;      /* Neon Cyan */
+  --color-accent: #EC4899;         /* Hot Pink */
+  
+  --color-bg-main: #0B0E14;        /* Deep Space Black */
+  --color-bg-card: rgba(255, 255, 255, 0.03);
+  --color-border-main: rgba(255, 255, 255, 0.08);
+  --color-text-main: #FFFFFF;
+  --color-text-dim: #E2E8F0;
+  
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-main text-text-main font-sans min-h-screen selection:bg-primary/30 selection:text-white;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-bg-card backdrop-blur-xl rounded-[2.5rem] shadow-2xl border border-border-main p-8 transition-all hover:border-primary/30 hover:bg-white/[0.05];
+  }
+  
+  .sticky-col {
+    @apply sticky left-0 bg-[#0B0E14] z-10 min-w-[280px] border-r border-white/5;
+  }
+  
+  .neon-glow {
+    @apply shadow-[0_0_15px_rgba(139,92,246,0.3)];
+  }
+}
+
+/* Response Widths */
+.main-container {
+  @apply max-w-[1920px] mx-auto px-4 sm:px-8;
+}
+
+/* Custom styles for the grid */
+.habit-grid-container {
+  @apply overflow-x-auto;
+}
+
+table {
+  @apply border-collapse border-spacing-0 w-full;
+}
+
+th, td {
+  @apply border border-white/[0.05];
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
