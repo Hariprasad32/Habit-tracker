@@ -14,6 +14,8 @@ import Swal from 'sweetalert2';
 import './index.css';
 
 const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
+console.log(import.meta.env.VITE_API_URL)
+console.log(API_BASE)
 
 const App: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(() => {
