@@ -13,7 +13,7 @@ import { Flame, CheckCircle2, Trophy, BarChart2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import './index.css';
 
-const API_BASE = 'http://localhost:5001/api';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
 
 const App: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(() => {

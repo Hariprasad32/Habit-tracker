@@ -5,5 +5,5 @@
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true
   },
-  "include": ["vite.config.ts", "tailwind.config.cjs", "postcss.config.cjs"]
+  "include": ["vite.config.ts","src/vite-env.d.ts","tailwind.config.cjs", "postcss.config.cjs"]
 }
