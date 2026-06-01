@@ -12,10 +12,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5001;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/habitflow';
-const JWT_SECRET = process.env.JWT_SECRET || 'habit_flow_secret_key_123';
-
+const PORT = process.env.PORT 
+const MONGO_URI = process.env.MONGO_URI ;
+console.log("dhfasdjfas",MONGO_URI)
+const JWT_SECRET = process.env.JWT_SECRET ;
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
