@@ -12,9 +12,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5001;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/habitflow';
-const JWT_SECRET = process.env.JWT_SECRET || 'habit_flow_secret_key_123';
+const PORT = process.env.PORT ;
+const MONGO_URI = process.env.MONGO_URI 
+const JWT_SECRET = process.env.JWT_SECRET 
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
@@ -46,7 +46,7 @@ app.post('/api/auth/register', async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET);
-    res.status(201).json({ user: { id: user._id, email, name }, token });
+    res.status(201).json({ user: { id: user._id, email, name, createdAt: user.createdAt }, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -63,7 +63,7 @@ app.post('/api/auth/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ error: 'Invalid login credentials' });
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET);
-    res.json({ user: { id: user._id, email: user.email, name: user.name }, token });
+    res.json({ user: { id: user._id, email: user.email, name: user.name, createdAt: user.createdAt }, token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

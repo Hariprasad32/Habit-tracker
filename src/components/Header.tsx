@@ -21,13 +21,13 @@ export const Header: React.FC<HeaderProps> = ({
   userName
 }) => {
   return (
-    <header className="px-4 sm:px-8 pt-8 flex flex-col md:flex-row gap-6 justify-between items-center sticky top-0 z-50 pb-6 bg-[#0B0E14]/80 backdrop-blur-xl">
+    <header className="px-4 sm:px-8 pt-4 sm:pt-8 flex flex-col md:flex-row gap-4 sm:gap-6 justify-between items-center sticky top-0 z-50 pb-4 sm:pb-6 bg-[#0B0E14]/80 backdrop-blur-xl">
       <div className="flex items-center gap-10 w-full md:w-auto justify-between md:justify-start">
-        <div className="flex items-center gap-4 text-primary">
-          <div className="p-2 bg-primary/20 rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-            <CheckCircle2 size={32} strokeWidth={2.5} />
+        <div className="flex items-center gap-2 sm:gap-4 text-primary">
+          <div className="p-1.5 sm:p-2 bg-primary/20 rounded-lg sm:rounded-xl shadow-[0_0_15px_rgba(139,92,246,0.2)]">
+            <CheckCircle2 size={24} className="sm:w-8 sm:h-8" strokeWidth={2.5} />
           </div>
-          <span className="text-2xl font-black tracking-tight text-white uppercase italic">HabitFlow</span>
+          <span className="text-lg sm:text-2xl font-black tracking-tight text-white uppercase italic">Quanta</span>
         </div>
         
         <div className="flex items-center gap-2 bg-white/5 rounded-2xl border border-white/5 p-1.5 shadow-inner">

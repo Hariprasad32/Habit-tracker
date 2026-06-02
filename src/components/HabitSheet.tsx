@@ -10,6 +10,7 @@ interface HabitSheetProps {
   currentDate: Date;
   onEditHabit: (habit: Habit) => void;
   onDeleteHabit: (id: string) => void;
+  userJoinDate?: string;
 }
 
 const HabitSheet: React.FC<HabitSheetProps> = ({ 
@@ -18,28 +19,35 @@ const HabitSheet: React.FC<HabitSheetProps> = ({
   onToggle, 
   currentDate,
   onEditHabit,
-  onDeleteHabit
+  onDeleteHabit,
+  userJoinDate
 }) => {
   const today = new Date();
   today.setHours(0,0,0,0);
 
   const weeks = useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const lastDay = new Date(year, month + 1, 0).getDate();
-    const weeksArr: WeekData[] = [];
-    let currentWeek: Date[] = [];
+    // If no join date, start from today instead of the 1st of the month
+    const start = userJoinDate ? new Date(userJoinDate) : new Date();
+    start.setHours(0,0,0,0);
     
-    for (let dayNum = 1; dayNum <= lastDay; dayNum++) {
-      const d = new Date(year, month, dayNum);
-      currentWeek.push(d);
-      if (d.getDay() === 0 || dayNum === lastDay) {
-        weeksArr.push({ weekNumber: weeksArr.length + 1, days: currentWeek });
-        currentWeek = [];
+    // Number of weeks to end of the year
+    const endOfYear = new Date(start.getFullYear(), 11, 31);
+    const weeksArr: WeekData[] = [];
+    
+    let currentDay = new Date(start);
+    let weekNum = 1;
+    
+    while (currentDay <= endOfYear) {
+      const weekDays: Date[] = [];
+      for (let i = 0; i < 7; i++) {
+        if (currentDay > endOfYear) break;
+        weekDays.push(new Date(currentDay));
+        currentDay.setDate(currentDay.getDate() + 1);
       }
+      weeksArr.push({ weekNumber: weekNum++, days: weekDays });
     }
     return weeksArr;
-  }, [currentDate]);
+  }, [userJoinDate]);
 
   const getDateKey = (date: Date) => {
     const year = date.getFullYear();
@@ -48,49 +56,63 @@ const HabitSheet: React.FC<HabitSheetProps> = ({
     return `${year}-${month}-${day}`;
   };
 
+  const todayKey = getDateKey(today);
+
+  React.useEffect(() => {
+    // Scroll to today on mount
+    const todayEl = document.getElementById(`day-${todayKey}`);
+    if (todayEl) {
+      todayEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, [weeks]);
+
   return (
-    <div className="card !p-0 overflow-hidden border border-white/[0.05] shadow-[0_30px_60px_rgba(0,0,0,0.4)] bg-[#0B0E14]">
-      <div className="overflow-x-auto habit-grid-container no-scrollbar">
-        <table className="w-full border-separate border-spacing-0">
+    <div className="card !p-0 overflow-hidden border border-white/[0.05] shadow-[0_30px_90px_-15px_rgba(0,0,0,0.6)] bg-[#0B0E14]">
+      <div className="overflow-x-auto habit-grid-container no-scrollbar scroll-smooth selection:bg-transparent">
+
+         <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr className="bg-white/[0.02]">
-              <th className="sticky-col p-8 text-2xl font-black text-left z-40 bg-[#0B0E14] border-b border-white/[0.05] text-white">
+              <th className="sticky-col p-3 sm:p-8 text-lg sm:text-2xl font-black text-left z-40 bg-[#0B0E14] border-b border-white/[0.05] text-white">
                  Habits
               </th>
               {weeks.map((week) => (
-                <th key={week.weekNumber} colSpan={week.days.length} className="border-b border-r border-white/[0.05] py-4 text-[10px] uppercase font-black tracking-[0.3em] text-white/40 sticky top-0 bg-[#0B0E14] z-20">
+                <th key={week.weekNumber} colSpan={week.days.length} className="border-b border-r border-white/10 py-4 text-[8px] sm:text-[10px] uppercase font-black tracking-[0.3em] text-white/50 sticky top-0 bg-[#0B0E14] z-20">
                   Week {week.weekNumber}
                 </th>
               ))}
             </tr>
             <tr>
-              <th className="sticky-col p-0 z-40 bg-[#0B0E14] border-b border-white/5"></th>
+              <th className="sticky-col p-0 z-40 bg-[#0B0E14] border-b border-white/10 border-r-2 border-r-primary/10"></th>
               {weeks.map((week) => (
                 <React.Fragment key={`days-${week.weekNumber}`}>
-                  {week.days.map((day) => (
-                    <th key={day.toISOString()} className="border-b border-r border-white/[0.05] min-w-[76px] py-4 text-center sticky top-14 bg-[#0B0E14] z-20">
-                      <div className="flex flex-col items-center gap-0.5">
-                        <span className="text-[10px] font-black text-white/30 uppercase tracking-widest">{day.toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                        <span className="text-sm font-black text-white/60">{day.getDate().toString().padStart(2, '0')}</span>
-                      </div>
-                    </th>
-                  ))}
+                  {week.days.map((day) => {
+                    const isToday = getDateKey(day) === todayKey;
+                    return (
+                      <th key={day.toISOString()} className={`border-b border-r border-white/[0.05] min-w-[50px] sm:min-w-[76px] py-3 sm:py-4 text-center sticky top-14 bg-[#0B0E14] z-20 ${isToday ? 'bg-primary/[0.03]' : ''}`}>
+                        <div className="flex flex-col items-center gap-0.5">
+                          <span className={`text-[8px] sm:text-[10px] font-black uppercase tracking-widest ${isToday ? 'text-primary' : 'text-white/40'}`}>{day.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                          <span className={`text-[10px] sm:text-sm font-black ${isToday ? 'text-primary ring-1 ring-primary/20 bg-primary/10 px-1 rounded' : 'text-white/60'}`}>{day.getDate().toString().padStart(2, '0')}</span>
+                        </div>
+                      </th>
+                    );
+                  })}
                 </React.Fragment>
               ))}
             </tr>
           </thead>
           <tbody>
             {habits.map((habit) => (
-              <tr key={habit.id} className="group hover:bg-white/[0.02] transition-colors">
-                <td className="sticky-col p-6 border-b border-white/[0.05] z-30 bg-[#0B0E14] group-hover:bg-primary/[0.03] transition-all shadow-[8px_0_15px_-10px_rgba(0,0,0,0.5)]">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 overflow-hidden">
-                      <span className="text-2xl drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">{habit.emoji}</span>
-                      <span className="text-base font-black text-white/90 group-hover:text-white transition-colors truncate">{habit.name}</span>
+              <tr key={habit.id} className="group hover:bg-white/[0.01] transition-colors">
+                <td className="sticky-col p-3 sm:p-6 border-b border-white/[0.08] z-30 bg-[#0B0E14] group-hover:bg-primary/[0.02] transition-all shadow-[10px_0_20px_-5px_rgba(0,0,0,0.7)] border-r-2 border-r-primary/5 max-w-[100px] sm:max-w-none">
+                  <div className="flex items-center justify-between gap-2 sm:gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
+                      <span className="text-lg sm:text-2xl drop-shadow-[0_0_12px_rgba(255,255,255,0.2)] flex-shrink-0">{habit.emoji}</span>
+                      <span className="text-[10px] sm:text-base font-black text-white group-hover:text-primary transition-colors truncate tracking-tight">{habit.name}</span>
                     </div>
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                      <button onClick={() => onEditHabit(habit)} className="p-2 text-white/30 hover:text-primary hover:bg-primary/10 rounded-xl transition-all"><Edit3 size={16} /></button>
-                      <button onClick={() => onDeleteHabit(habit.id)} className="p-2 text-white/30 hover:text-accent hover:bg-accent/10 rounded-xl transition-all"><Trash2 size={16} /></button>
+                    <div className="flex items-center gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                      <button onClick={() => onEditHabit(habit)} className="p-1 sm:p-2 text-white/40 hover:text-primary hover:bg-secondary/10 rounded-lg transition-all"><Edit3 size={11} className="sm:w-4 sm:h-4" /></button>
+                      <button onClick={() => onDeleteHabit(habit.id)} className="p-1 sm:p-2 text-white/40 hover:text-accent hover:bg-accent/10 rounded-lg transition-all"><Trash2 size={11} className="sm:w-4 sm:h-4" /></button>
                     </div>
                   </div>
                 </td>
@@ -101,33 +123,49 @@ const HabitSheet: React.FC<HabitSheetProps> = ({
                       const isDone = completions[dateKey]?.[habit.id];
                       const dayTime = new Date(day); dayTime.setHours(0,0,0,0);
                       const isFuture = dayTime > today;
+                      const isToday = dateKey === todayKey;
+                      const isPast = dayTime < today;
 
                         return (
                           <td 
                             key={`${habit.id}-${dateKey}`} 
-                            className={`border-b border-r border-white/[0.05] p-0 relative transition-all ${
-                              getDateKey(day) !== getDateKey(today) 
-                                ? 'cursor-not-allowed bg-white/[0.01]' 
-                                : 'hover:bg-primary/[0.05] cursor-pointer'
+                            id={`day-${dateKey}`}
+                            className={`border-b border-r border-white/[0.05] p-0 relative transition-all duration-300 select-none touch-manipulation ${
+                              !isToday 
+                                ? 'bg-white/[0.01]' 
+                                : 'bg-primary/[0.02]'
                             }`} 
-                            onClick={() => getDateKey(day) === getDateKey(today) && onToggle(habit.id, dateKey)}
+                            onClick={() => isToday && onToggle(habit.id, dateKey)}
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
                           >
-                            <div className={`flex items-center justify-center p-5 ${getDateKey(day) !== getDateKey(today) ? 'opacity-40' : ''}`}>
-                               <div className={`w-8 h-8 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 ${
+                            <div className={`flex items-center justify-center p-2.5 sm:p-5 relative ${!isToday ? 'opacity-40 grayscale-[0.5]' : 'z-10'}`}>
+                               <div className={`w-6 h-6 sm:w-10 sm:h-10 rounded-lg sm:rounded-2xl border-2 flex items-center justify-center transition-all duration-500 relative group/cell ${
                                  isDone 
-                                   ? 'bg-primary border-primary scale-110 shadow-[0_0_20px_rgba(139,92,246,0.5)] rotate-[360deg]' 
-                                   : 'border-white/10 bg-white/5'
-                               } ${getDateKey(day) !== getDateKey(today) ? 'border-dashed' : ''}`}>
+                                   ? 'bg-gradient-to-br from-primary to-[#7c3aed] border-primary scale-110 shadow-[0_0_20px_rgba(139,92,246,0.4)] rotate-[360deg]' 
+                                   : isPast 
+                                     ? 'border-accent/30 bg-accent/5' 
+                                     : 'border-white/10 bg-transparent group-hover:border-primary/40'
+                               } ${!isToday ? 'border-dashed cursor-not-allowed' : 'cursor-pointer'}`}>
+                                
                                 <AnimatePresence mode="wait">
                                   {isDone && (
-                                    <motion.div key="check" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}>
-                                      <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>
+                                    <motion.div key="check" initial={{ scale: 0, rotate: -45 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}>
+                                      <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-6 sm:h-6 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" fill="none" stroke="currentColor" strokeWidth="4"><polyline points="20 6 9 17 4 12" /></svg>
                                     </motion.div>
                                   )}
-                                  {isFuture && <Lock size={12} className="text-white/20" />}
+                                  {isFuture && (
+                                      <Lock size={10} className="text-white/20" />
+                                  )}
+                                  {isPast && !isDone && (
+                                     <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_8px_rgba(236,72,153,0.5)]" />
+                                  )}
                                 </AnimatePresence>
                               </div>
                             </div>
+
+                            {isToday && (
+                               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary/30" />
+                            )}
                           </td>
                         );
                     })}

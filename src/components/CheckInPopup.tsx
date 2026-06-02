@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, Flame, Sparkles, Quote, Trophy } from 'lucide-react';
 
@@ -7,18 +7,36 @@ interface CheckInPopupProps {
   onClose: () => void;
 }
 
-const QUOTES = [
-  "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
-  "The secret of your future is hidden in your daily routine.",
-  "Your habits will determine your future. Choose wisely.",
-  "Motivation is what gets you started. Habit is what keeps you going.",
-  "Small daily improvements over time lead to stunning results.",
-  "Success is the sum of small efforts repeated day in and day out.",
-  "Discipline is choosing between what you want now and what you want most."
-];
+const FALLBACK_QUOTE = "Small daily improvements over time lead to stunning results.";
 
 const CheckInPopup: React.FC<CheckInPopupProps> = ({ streak, onClose }) => {
-  const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  const [quote, setQuote] = useState(FALLBACK_QUOTE);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchQuote = async () => {
+      try {
+        // Trying direct fetch first (some browsers/APIs now allow this or have CORS)
+        const response = await fetch('https://api.quotable.io/random');
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        setQuote(data.content);
+      } catch (err) {
+        // Fallback to proxy if direct fails
+        try {
+          const proxyRes = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://zenquotes.io/api/random'));
+          const data = await proxyRes.json();
+          const q = JSON.parse(data.contents);
+          if (q && q[0]) setQuote(q[0].q);
+        } catch (e) {
+          console.error('Final fallback');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuote();
+  }, []);
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
@@ -62,11 +80,19 @@ const CheckInPopup: React.FC<CheckInPopupProps> = ({ streak, onClose }) => {
             
             <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/30 mb-8">You're on fire! Keep it moving.</p>
 
-            <div className="relative mb-8 p-6 bg-white/5 rounded-2xl border border-white/5">
-                <Quote size={30} className="absolute -top-4 -left-4 text-primary opacity-30" />
-                <p className="text-lg font-medium text-white italic leading-relaxed">"{randomQuote}"</p>
-                <Quote size={30} className="absolute -bottom-4 -right-4 text-primary opacity-30 rotate-180" />
-            </div>
+            <div className="relative mb-8 p-6 bg-white/5 rounded-2xl border border-white/5 min-h-[100px] flex items-center justify-center">
+                 <Quote size={30} className="absolute -top-4 -left-4 text-primary opacity-30" />
+                 {loading ? (
+                    <div className="flex gap-1">
+                       <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" />
+                       <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
+                       <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
+                    </div>
+                 ) : (
+                    <p className="text-lg font-medium text-white italic leading-relaxed">"{quote}"</p>
+                 )}
+                 <Quote size={30} className="absolute -bottom-4 -right-4 text-primary opacity-30 rotate-180" />
+             </div>
 
             <div className="grid grid-cols-2 gap-4 w-full">
                <div className="p-4 bg-white/[0.02] rounded-2xl border border-white/5 flex flex-col items-center">
