@@ -103,7 +103,20 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    if (token) fetchHabits();
+    if (token) {
+      fetchHabits();
+      // Pre-load daily quote for the check-in popup
+      const today = new Date().toISOString().split('T')[0];
+      const cached = localStorage.getItem('daily_quote');
+      if (!cached || JSON.parse(cached).date !== today) {
+        fetch('https://api.quotable.io/random')
+          .then(res => res.json())
+          .then(data => {
+            localStorage.setItem('daily_quote', JSON.stringify({ quote: data.content, date: today }));
+          })
+          .catch(() => {}); // silent fail, popup will handle it
+      }
+    }
   }, [token]);
 
   const stats = useMemo(() => {

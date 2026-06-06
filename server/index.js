@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const User = require('./models/User');
 const Habit = require('./models/Habit');
@@ -12,10 +13,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT ;
-const MONGO_URI = process.env.MONGO_URI 
-const JWT_SECRET = process.env.JWT_SECRET 
-
+const PORT = process.env.PORT?.trim() || 5000;
+const MONGO_URI = process.env.MONGO_URI?.trim();
+const JWT_SECRET = process.env.JWT_SECRET?.trim();
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB Connection Error:', err));
@@ -39,7 +39,7 @@ app.post('/api/auth/register', async (req, res) => {
   const { email, password, name } = req.body;
   try {
     const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ error: 'User already exists' });
+    if (existingUser) return res.status(409).json({ error: 'This email is already registered. Please sign in instead.' });
 
     const hashedPassword = await bcrypt.hash(password, 8);
     const user = new User({ email, password: hashedPassword, name });
@@ -57,10 +57,10 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     console.log("trying to login")
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Invalid login credentials' });
+    if (!user) return res.status(404).json({ error: 'No account found with this email address' });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: 'Invalid login credentials' });
+    if (!isMatch) return res.status(401).json({ error: 'Incorrect password. Please try again.' });
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET);
     res.json({ user: { id: user._id, email: user.email, name: user.name, createdAt: user.createdAt }, token });

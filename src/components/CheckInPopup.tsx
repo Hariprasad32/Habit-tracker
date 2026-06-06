@@ -14,20 +14,35 @@ const CheckInPopup: React.FC<CheckInPopupProps> = ({ streak, onClose }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const cachedData = localStorage.getItem('daily_quote');
+    
+    if (cachedData) {
+      const { quote: cachedQuote, date } = JSON.parse(cachedData);
+      if (date === today) {
+        setQuote(cachedQuote);
+        setLoading(false);
+        return;
+      }
+    }
+
     const fetchQuote = async () => {
       try {
-        // Trying direct fetch first (some browsers/APIs now allow this or have CORS)
         const response = await fetch('https://api.quotable.io/random');
         if (!response.ok) throw new Error();
         const data = await response.json();
-        setQuote(data.content);
+        const newQuote = data.content;
+        setQuote(newQuote);
+        localStorage.setItem('daily_quote', JSON.stringify({ quote: newQuote, date: today }));
       } catch (err) {
-        // Fallback to proxy if direct fails
         try {
           const proxyRes = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://zenquotes.io/api/random'));
           const data = await proxyRes.json();
           const q = JSON.parse(data.contents);
-          if (q && q[0]) setQuote(q[0].q);
+          if (q && q[0]) {
+            setQuote(q[0].q);
+            localStorage.setItem('daily_quote', JSON.stringify({ quote: q[0].q, date: today }));
+          }
         } catch (e) {
           console.error('Final fallback');
         }

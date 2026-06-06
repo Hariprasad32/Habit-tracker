@@ -28,17 +28,29 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin }) => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Authentication failed');
+      if (!response.ok) {
+        const error = new Error(data.error || 'Authentication failed');
+        (error as any).status = response.status;
+        throw error;
+      }
 
       onLogin(data.token, data.user);
     } catch (err: any) {
+      let title = 'Authentication Error';
+      if (err.status === 404) title = 'Account Not Found';
+      if (err.status === 401) title = 'Incorrect Password';
+      if (err.status === 409) title = 'Account Already Exists';
+      if (err.message.includes('email') && !title) title = 'Email Error';
+
       Swal.fire({
         icon: 'error',
-        title: 'Auth Failed',
+        title: title,
         text: err.message,
-        background: '#161B22',
+        background: '#0B0E14',
         color: '#fff',
-        confirmButtonColor: '#8B5CF6'
+        confirmButtonColor: '#8B5CF6',
+        timer: 4000,
+        timerProgressBar: true
       });
     } finally {
       setLoading(false);
